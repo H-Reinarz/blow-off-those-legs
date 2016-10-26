@@ -6,3 +6,6 @@ Marburg C++ Homework
  - Bjarne Stroustrup, Founder of C++
 
 Rep für Hausaufgaben und Übungen des C++-Kurses.
+
+Die Ordnerstruktur des Repositorys folgt der Struktur für die Abgabe der Übungen.
+Pro Blatt einen Hauptordner. Aufgaben mit einzelnen Teilen (Quelldateien) in einzelne Unterordner (zB. "A1.1").
