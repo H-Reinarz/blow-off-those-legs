@@ -1,0 +1,17 @@
+(a) 6
+(b) 3
+(c) void
+(d) FALSE
+(e) 20
+(f) 16
+(g)	(2 | b) & (a ^ b)
+	35 & 36
+	32
+(h) TRUE && ((c - d) != a)
+	TRUE && (-949 != a)
+	TRUE && TRUE
+	TRUE
+(i) TRUE ? b * c : c * d
+	1683
+(j) (165 - 2)
+	163
