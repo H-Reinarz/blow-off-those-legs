@@ -1,0 +1,33 @@
+a) while (!Abbruchbed && Bedingung){
+	Anweisung1
+	if (!Abbruchbed)
+		Anweisung2;
+	}
+	
+while (Bedingung){
+	Anweisung1
+	if (!Abbruchbed)
+		Anweisung2;
+	}
+	
+b)
+
+Ersetzung von IF:
+
+for (;Bedingung;){
+	Anweisung
+}
+
+Ersetzung von WHILE:
+
+for (int i=0; Bedingung; i++){
+	Anweisung
+}
+
+
+Ersetzung von DO...WHILE:
+
+Anweisung
+for (int i=0; Bedingung; i++){
+	Anweisung
+}
