@@ -1,3 +1,6 @@
+// Bearbeitet von Philipp Reiners, Henning Reinarz und Jannik Guenther
+// Programmieren mit C++
+// Aufgabe 2.4
 #include <stdio.h>
 
 int main (void){

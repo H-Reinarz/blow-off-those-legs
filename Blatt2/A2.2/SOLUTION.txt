@@ -1,3 +1,7 @@
+// Bearbeitet von Philipp Reiners, Henning Reinarz und Jannik Guenther
+// Programmieren mit C++
+// Aufgabe 2.2
+
 a) while (!Abbruchbed && Bedingung){
 	Anweisung1
 	if (!Abbruchbed)
