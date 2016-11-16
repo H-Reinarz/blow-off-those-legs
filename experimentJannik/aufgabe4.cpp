@@ -62,12 +62,12 @@ int main(void){
 	Tagesliste test = *erstelleTagesListe(5);
 	Aufgabe auftragen = {2,4,7,"Auftragen"};
 	Aufgabe polieren = {9,9,9,"Polieren"};
-	
-	fuegeEin(&test,&polieren);
-	printf("%d",test.aufgabe->bis);
-	fuegeEin(&test,&auftragen);
-	printf("%d",test.aufgabe->bis);
-	
+//	
+//	fuegeEin(&test,&polieren);
+//	printf("%d\n",test.aufgabe->bis);
+//	fuegeEin(&test,&auftragen);
+//	printf("%d",test.aufgabe->bis);
+//	
 	
 	
 }
