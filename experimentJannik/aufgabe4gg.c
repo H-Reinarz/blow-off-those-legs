@@ -6,8 +6,10 @@
 // Aufzaehlung der Wochentage
 enum Wochentag {MONTAG, DIENSTAG, MITTWOCH, DONNERSTAG, FREITAG};
 
+int mallocCall, freeCall;
+
 // Temporaere Stringlaenge, bis "beschreibung" dynamisch wird. WIP
-typedef char beschreibungP[1024];
+//typedef char beschreibungP[1024];
 
 // Datentyp: Aufgabe
 // Besteht aus "von, bis, prioritaet, beschreibung" und zusaetzlich aus einem initalisierten Zeiger der Groesse "Aufgabe", um den Speicher 
@@ -16,7 +18,7 @@ typedef struct AufgabeTag{
 	int von;
 	int bis;
 	int prioritaet;
-	beschreibungP beschreibung;
+	char *beschreibung;
 	struct AufgabeTag *next;
 } Aufgabe, *AufgabePointer;
 
@@ -29,70 +31,109 @@ typedef struct{
 } Tagesliste, *TListPointer;
 
 // Datentyp: TODOListe
-typedef struct{
-	Tagesliste *tageslisten[7];
-} TODOListe, *TODOPointer;
+typedef Tagesliste *TODOListe[7];
+
 
 // Erstelle TagesListe mit Kapazitaetswert
 Tagesliste *erstelleTagesListe(int kapazitaet2){
 	// Speichere im Pointer neueListe vom Typ TListPointer die Adresse zum reservierten Speicher
 	TListPointer neueListe = (TListPointer)malloc(sizeof(Tagesliste));
+	mallocCall++;
 	// Fuege dort in die Kapazitaet, den übergebenen Wert sein
 	neueListe -> kapazitaet = kapazitaet2;
-	neueListe->aufgabe = NULL;
+	neueListe->aufgabe = 0;
 	// Gebe den Pointer zurueck
 	return neueListe;
 }
 
+void loescheAufgabe(Aufgabe *aufgabe){
+	
+	if (aufgabe == NULL){
+		return;
+	}
+	loescheAufgabe(aufgabe->next);
+	free(aufgabe->beschreibung);
+	free(aufgabe);
+	freeCall++;
+
+}
+
 // Loese Liste
 void loescheTagesListe(Tagesliste *tl){
-	free(tl);
+	
+	if(tl != NULL){
+		loescheAufgabe(tl->aufgabe);
+		free(tl);
+		freeCall++;
+
+	}
+	
 }
+
+
 
 Aufgabe *erstelleAufgabe(){
 	AufgabePointer neueAufgabe = (AufgabePointer)malloc(sizeof(Aufgabe));
+	mallocCall++;
 	
-	int von;
-	int bis;
-	int prioritaet;
-	beschreibungP beschreibung;
 	
-	printf("Bitte Daten eingeben: \n");
-	printf("Von: ");
-	scanf("%d",&von);
-	printf("Bis: ");
-	scanf("%d",&bis);
-	printf("Prioritaet (1-10): ");
-	scanf("%d", &prioritaet);
+	printf("\nBitte Daten eingeben: \n");
+	do{
+		printf("Von: ");
+		scanf("%d",&neueAufgabe->von);
+	} while(neueAufgabe->von < 0 || neueAufgabe->von > 24);
+	
+	do{
+		printf("Bis: ");
+		scanf("%d",&neueAufgabe->bis);	
+	} while(neueAufgabe->bis <= neueAufgabe->von || (neueAufgabe->bis < 0 || neueAufgabe->bis > 24));
+	
+	
+	do{
+		printf("Prioritaet (1-10): ");
+		scanf("%d", &neueAufgabe->prioritaet);	
+	} while(neueAufgabe->prioritaet < 1 || neueAufgabe->prioritaet > 10);
+	
+	// Reste der letzten Eingaben mit scanf löschen
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
 	printf("Beschreibung: ");
-	scanf("%s", &beschreibung);
-	
-	
-	
-	neueAufgabe->von = von;
-	neueAufgabe->bis = bis;
-	neueAufgabe->prioritaet = prioritaet;
-	strcpy(neueAufgabe->beschreibung,beschreibung);
-	
+	char buffer[1024];
+	fgets(buffer, 1024, stdin);				 
+	                            neueAufgabe->beschreibung = malloc(strlen(buffer));
+                                strcpy(neueAufgabe->beschreibung, buffer);
+	neueAufgabe->next = NULL;	
 	return neueAufgabe;
 	
 }
 
-void zeigeListe(TODOListe l){
-	
-}
-
-
 int fuegeEin(Tagesliste *l, Aufgabe *a){
 	
-
+	
+	l->kapazitaet = l->kapazitaet - (a->bis - a->von);
+	l->auslastung = l->auslastung + (a->bis - a->von);
+	
+	
+	
+	Aufgabe *pEintrag;
+			for(pEintrag = l->aufgabe; pEintrag != NULL; pEintrag = pEintrag->next)
+				if(pEintrag->von < a->bis && a->von < pEintrag->bis){
+					loescheAufgabe(a)	;
+					return 1; // Kollision gefunden -> Abbruch
+					
+					
+				}
+				
+	
+	
 	Aufgabe *neueAufgabe;
 	
-	if(l->aufgabe == NULL){
+	if(l->aufgabe == NULL && l->auslastung <= l->kapazitaet){
 		l->aufgabe = a;
 		
-		
-	} else{
+		return 0;	
+	} 
+	if(l->auslastung <= l->kapazitaet){
 		
 		neueAufgabe = l->aufgabe;
 		
@@ -104,24 +145,29 @@ int fuegeEin(Tagesliste *l, Aufgabe *a){
 		
 		
 		neueAufgabe->next = a;
+		return 0;
+	} 
+	else{
+	
+		return 2;
 	}
 }
 	
 void printliste(Aufgabe *a){
 
     for( ; a != NULL ; a = a->next ){
-    	printf("JA GG!");
+    	
     	printf("Von %d bis %d, Prioritaet: %d, %s\n\n", a->von,a->bis,a->prioritaet,a->beschreibung);
     }
 }	
 	
-void printTodo(TODOListe *todo){
+void printTodo(TODOListe todo){
 	
 	for(int i = 0; i < 7; i++){
 		
-		if (todo->tageslisten[i] != NULL){
+		if (todo[i] != NULL){
 			printf("Wochentag: %d\n",i);
-			printliste(todo->tageslisten[i]->aufgabe);	
+			printliste(todo[i]->aufgabe);	
 		}
 		
 	}
@@ -137,40 +183,78 @@ int main(void){
 	int auswahl = 0;
 	int Tag = 0;
 	TODOListe todoListe;
+	todoListe[0]=NULL;
+	todoListe[1]=NULL;
+	todoListe[2]=NULL;
+	todoListe[3]=NULL;
+	todoListe[4]=NULL;
+	todoListe[5]=NULL;
+	todoListe[6]=NULL;
 	
-    todoListe.tageslisten[0] = NULL;
-	todoListe.tageslisten[1] = NULL;
-   	todoListe.tageslisten[2] = NULL;
-   	todoListe.tageslisten[3] = NULL;
-    todoListe.tageslisten[4] = NULL;
-    todoListe.tageslisten[5] = NULL;
-   	todoListe.tageslisten[6] = NULL;
-	
-	while(auswahl != 3){
+	while(auswahl != 4){
 		printf("1 - Aufgabe anlegen\n");
 		printf("2 - Liste ausgeben\n");
-		printf("3 - Programm beenden\n");
+		printf("3 - Speicheranforderungen und -freigaben anzeigen (malloc & free)\n");
+		printf("\n");
+		printf("4 - Programm beenden\n");
+		printf("====================\n");
 		scanf("%d",&auswahl);
 		
 		if(auswahl == 1){
-			printf("\nWochentag (Mo=1, So=7): ");
-			scanf("%d",&Tag);
+			do{
+				printf("\nWochentag (Mo=1, So=7): ");
+				scanf("%d",&Tag);
+			} while(Tag > 7 ||Tag < 1);
+			
 			Tag--;
 			
-			if(todoListe.tageslisten[Tag] == NULL){
-				todoListe.tageslisten[Tag] = &(*erstelleTagesListe(24));
-				fuegeEin(todoListe.tageslisten[Tag],&(*erstelleAufgabe()));
+			if(todoListe[Tag] == NULL){
+				todoListe[Tag] = erstelleTagesListe(12);
+				//fuegeEin(todoListe[Tag],erstelleAufgabe());
+				
+				switch( fuegeEin(todoListe[Tag],erstelleAufgabe()) ) {
+					
+					case(1):
+						printf("Aufgaben kollidieren miteinander! (Fehlercode: 1)\n\n");
+						
+						break;
+					case(2):
+						printf("\nTag hat nur 24 Stunden. Auslastung zu gross! (Fehlercode: 2)\n\n");
+						loescheTagesListe(todoListe[Tag]);
+						todoListe[Tag] = NULL;
+						break;
+				}
 			} else{
-				fuegeEin(todoListe.tageslisten[Tag],&(*erstelleAufgabe()));
+				
+				switch(fuegeEin(todoListe[Tag],erstelleAufgabe())){
+					
+					case(1):
+						printf("Aufgaben kollidieren miteinander! (Fehlercode: 1) \n\n");
+						break;
+					case(2):
+						printf("\nTag hat nur 24 Stunden. Auslastung zu gross! (Fehlercode: 2)\n\n");
+						break;
+				}
 			}
 			printf("\n");
 			
 		}
 		
 		if(auswahl == 2){
-			printTodo(&todoListe);
+			printTodo(todoListe);
 
 		}	
-	}		
+		
+		if(auswahl == 3){
+			printf("\nSpeicher angefordert: %d mal\n",mallocCall);
+			printf("Groesse einer Anforderung: %d Bytes\n", sizeof(Aufgabe));
+			printf("Angeforderter Speicher geloescht: %d mal\n\n",freeCall);
+		}
+	}
+	for(int i = 0;i<7;i++){
+		loescheTagesListe(todoListe[i]);
+	}
+	printf("Speicher angefordert: %d mal\n",mallocCall);
+	printf("Angeforderter Speicher geloescht: %d mal\n",freeCall);
+	
 }
-
