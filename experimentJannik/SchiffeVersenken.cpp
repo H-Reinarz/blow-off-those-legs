@@ -115,18 +115,23 @@ class CSchiff{
 		}
 	 
 	 	int blockiert(CSchiff anderesSchiff){
-	 		switch(ausrichtung){
-	 			case(0):
-	 				if(anderesSchiff.getAusrichtung()==0){
-	 					if(yCoord == anderesSchiff.getY() && anderesSchiff.getX() >= xCoord-1 && xCoord+laenge ){
-						 }
-					 }
-	 				break;
-	 				
-	 			case(1):
-	 				break;		
-	 				
-			 }
+	 			bool blockiert = false;
+				for(int i = 0; i < l1; i++){
+					cout << "Koordinate Schiff1: " << endl << "X: " << coord1[i][0] << endl << "Y: " << coord1[i][1] << endl;
+					for(int j = 0; j < l2; j++){
+						cout << "Wird getestet gegen: " << endl << "X: " << coord2[j][0] << endl << "Y: " << coord2[j][1] << endl;
+						if (coord1[i][0] == coord2[j][0] && coord1[i][1] == coord2[j][1]){
+							blockiert = true;
+							cout << "BLOCKIERT" << endl;
+							break;
+						}
+					}
+					
+					if(blockiert == true){
+						break;
+					}
+					cout << "--------------------------" << endl;
+				}
 		 }
 	 
 		int getLaenge() {return laenge;}
