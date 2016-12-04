@@ -11,7 +11,7 @@ class CSchiff{
 		int yCoord = 999;
 		int ausrichtung = 999; // 0 = Nach rechts, 1 = Nach unten
 		int trefferCount = 0;
-		int koordArray[3][2]; //Das muss ein Pointer sein
+		//int koordArray[3][2]; //Das muss ein Pointer sein
 		
 		//int set(int l){ //Setter, vom Konstruktor aufgerufen
 		//	laenge = l;
@@ -55,7 +55,7 @@ class CSchiff{
 				yCoord = y;
 				ausrichtung = a;
 				laenge = l;
-				belegeKoordinaten(x,y,a,l);
+				//belegeKoordinaten(x,y,a,l);
 				return 0;
 			} else{
 				cout << "Das Schiff befindet sich nicht im Schlachtfeld! Aendern Sie die Position!" << endl;
@@ -63,7 +63,7 @@ class CSchiff{
 			}
 		}
 		
-		void belegeKoordinaten(int x,int y,int a,int l){
+/* 		void belegeKoordinaten(int x,int y,int a,int l){
 			switch(a){
 				case(0):
 					// Build CoordList
@@ -80,6 +80,8 @@ class CSchiff{
 					break;
 			}
 		}
+ */		
+		
 		
 		int treffer(int x, int y){
 			switch(ausrichtung){
@@ -113,20 +115,35 @@ class CSchiff{
 					}			
 			}
 		}
-	 
+		
+		// Fehlercodes: 1 = blockiert; 0 = nicht blockiert
 	 	int blockiert(CSchiff anderesSchiff){
-	 		switch(ausrichtung){
-	 			case(0):
-	 				if(anderesSchiff.getAusrichtung()==0){
-	 					if(yCoord == anderesSchiff.getY() && anderesSchiff.getX() >= xCoord-1 && xCoord+laenge ){
-						 }
-					 }
-	 				break;
-	 				
-	 			case(1):
-	 				break;		
-	 				
-			 }
+			
+			//if gleicher Anfang
+			
+			if (anderesSchiff.getAusrichtung() == ausrichtung){
+				switch(ausrichtung){
+					case 0:
+						// Dieses Schiff
+						int anfang_ds = xCoord
+						int ende_ds = xCoord + laenge
+						// Anderes Schiff
+						int anfang_as = anderesSchiff.getX()
+						int ende_as = anderesSchiff.getX() + anderesSchiff.getLaenge()
+						if ()
+						break;
+						
+					case(1):
+						//for
+						break;		
+						
+				 }
+			}
+			else if {
+				//mach wat anderet!
+			}
+			
+			
 		 }
 	 
 		int getLaenge() {return laenge;}
