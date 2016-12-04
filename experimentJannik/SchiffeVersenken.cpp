@@ -116,9 +116,9 @@ class CSchiff{
 	 
 	 	int blockiert(CSchiff anderesSchiff){
 	 			bool blockiert = false;
-				for(int i = 0; i < l1; i++){
+				for(int i = 0; i < laenge; i++){
 					cout << "Koordinate Schiff1: " << endl << "X: " << coord1[i][0] << endl << "Y: " << coord1[i][1] << endl;
-					for(int j = 0; j < l2; j++){
+					for(int j = 0; j < anderesSchiff.getLaenge(); j++){
 						cout << "Wird getestet gegen: " << endl << "X: " << coord2[j][0] << endl << "Y: " << coord2[j][1] << endl;
 						if (coord1[i][0] == coord2[j][0] && coord1[i][1] == coord2[j][1]){
 							blockiert = true;
