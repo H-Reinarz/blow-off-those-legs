@@ -1,30 +1,32 @@
 #include <iostream>
+#include <stdlib.h>
 using namespace std;
 
 
 
 class CSchiff{
 	private:
-		int laenge; 
+		int laenge = 999; 
 		int xCoord = 999; 
 		int yCoord = 999;
 		int ausrichtung = 999; // 0 = Nach rechts, 1 = Nach unten
 		int trefferCount = 0;
+		int koordArray[3][2]; //Das muss ein Pointer sein
 		
-		int set(int l){ //Setter, vom Konstruktor aufgerufen
-			laenge = l;
-		}
+		//int set(int l){ //Setter, vom Konstruktor aufgerufen
+		//	laenge = l;
+		//}
 		
 	public:
-		CSchiff(int l) { // Konstruktor
-			set(l);	                
+		CSchiff() { // Konstruktor //Ist das so legitim?
+			//set(l);	                
 		}  
 		
-		int isInBattlefield(int x, int y, int a) { // liegt das Schiff im Spielfeld 10x10?
+		int isInBattlefield(int x, int y, int a, int l){ // liegt das Schiff im Spielfeld 10x10?
 			int returnCode;
 			switch(a){ 
 				case(0):
-					if(x+laenge<=10 && x>= 0 && y <= 10 && y >= 0){
+					if(x+l<=10 && x>= 0 && y <= 10 && y >= 0){
 						returnCode = 0;
 						break;
 					} else{
@@ -32,7 +34,7 @@ class CSchiff{
 						break;
 					}
 				case(1):
-					if(x<=10 && x>= 0 && y+laenge <= 10 && y >= 0){
+					if(x<=10 && x>= 0 && y+l <= 10 && y >= 0){
 						returnCode = 0;	
 						break;
 					} else{
@@ -47,13 +49,35 @@ class CSchiff{
 			return returnCode;	
 		}
 		
-		int spawnShip(int x, int y, int a){
-			if(isInBattlefield(x,y,a) == 0){
+		int spawnShip(int x, int y, int a, int l){
+			if(isInBattlefield(x,y,a,l) == 0){
 				xCoord = x;
 				yCoord = y;
 				ausrichtung = a;
+				laenge = l;
+				belegeKoordinaten(x,y,a,l);
+				return 0;
 			} else{
 				cout << "Das Schiff befindet sich nicht im Schlachtfeld! Aendern Sie die Position!" << endl;
+				return 1;
+			}
+		}
+		
+		void belegeKoordinaten(int x,int y,int a,int l){
+			switch(a){
+				case(0):
+					// Build CoordList
+					for(int i = 0; i < l; i++){
+						koordArray[i][0] = x+i;
+						koordArray[i][1] = y;
+					}
+					break;
+				case(1):
+					for(int i = 0; i < l; i++){
+						koordArray[i][0] = x;
+						koordArray[i][1] = y+i;
+					}
+					break;
 			}
 		}
 		
@@ -93,6 +117,10 @@ class CSchiff{
 	 	int blockiert(CSchiff anderesSchiff){
 	 		switch(ausrichtung){
 	 			case(0):
+	 				if(anderesSchiff.getAusrichtung()==0){
+	 					if(yCoord == anderesSchiff.getY() && anderesSchiff.getX() >= xCoord-1 && xCoord+laenge ){
+						 }
+					 }
 	 				break;
 	 				
 	 			case(1):
@@ -113,11 +141,12 @@ class CSchiff{
 
 class CSpieler{
 	private:
-		CSchiff schlachtschiff;
-		CSchiff kreuzer;
-		CSchiff zerstoerer;
-		CSchiff uboot;
+		CSchiff flotte[10];
 		int schlachtfeld[10][10];
+		int schlachtschiff = 1;
+		int kreuzer = 2;
+		int zerstoerer = 3;
+		int uboot = 4;
 		
 		void createBattlefield(){
 			for(int iy = 0; iy < 10; iy++){
@@ -128,24 +157,51 @@ class CSpieler{
 		}
 		
 	public:
-		CSpieler(): schlachtschiff(5), kreuzer(4), zerstoerer(3), uboot(2) {createBattlefield();} //copy Konstruktor
+		CSpieler(): flotte() {createBattlefield();} //copy Konstruktor
 		
 		
 		void schiffe_setzen(){
-			kreuzer.spawnShip(0,0,0); //Hier muessen alle Schiffe gesetzt werden
 			
-			switch(kreuzer.getAusrichtung()){
-				case(0):
-					for(int feld = kreuzer.getX(); feld < kreuzer.getX()+kreuzer.getLaenge(); feld++){
-						schlachtfeld[kreuzer.getY()][feld] = 4;
-					}
-					break;
-			} 
+			int x = 0;
+			int y = 0;
+			int a = 0;
+			
+			for(int schiff = 0; schiff < 10; schiff++){
+				
+				int x = rand() % 10;
+				int y = rand() % 10;
+				int a = rand() % 2;
+				
+				while(flotte[schiff].spawnShip(x,y,a,2) == 1){ //Geht das so? Die Ueberpruefung und gleichzeitige Aufrufung der Funktion?
+					int x = rand() % 10;
+					int y = rand() % 10;
+					int a = rand() % 2;
+				}
+				
+				switch(flotte[schiff].getAusrichtung()){
+					case(0):
+						for(int feld = flotte[schiff].getX(); feld < flotte[schiff].getX()+flotte[schiff].getLaenge(); feld++){
+							schlachtfeld[flotte[schiff].getY()][feld] = 4;
+						}
+						break;
+					case(1):
+						for(int feld = flotte[schiff].getY(); feld < flotte[schiff].getY()+flotte[schiff].getLaenge();feld++){
+							schlachtfeld[feld][flotte[schiff].getX()] = 4;	
+						}
+						break;
+					default:
+						cout << "Ungueltige Ausrichtung" << endl;
+						break;
+				}
+				
+			}
+			
+		 
 		}
 		
 		void attack(int x, int y){
 			
-			switch(kreuzer.treffer(x,y)){ //Hier muessen theoretisch alle Schiffe durchlaufen werden, die sich auf dem Feld befinden
+			switch(3){ //Hier muessen theoretisch alle Schiffe durchlaufen werden, die sich auf dem Feld befinden
 				case(0):
 					schlachtfeld[y][x] = 1;
 					break;
@@ -163,7 +219,7 @@ class CSpieler{
 				for(int ix = 0; ix < 10; ix++){
 					switch(schlachtfeld[iy][ix]){
 						case(0): // Kein Schiff
-							cout << " " << " "; 
+							cout << "~" << " "; 
 							break;
 						case(1): // Treffer
 							cout << "x" << " ";
@@ -196,13 +252,8 @@ int main (void){
 	
 	
 	CSpieler spieler1;
-	spieler1.anzeigen();
+	//spieler1.anzeigen();
 	spieler1.schiffe_setzen();
-	spieler1.attack(2,0);
-	spieler1.attack(2,4);
-	spieler1.attack(0,0);
-	spieler1.attack(1,0);	
-	spieler1.attack(3,0);
 	spieler1.anzeigen();
 	
 	
