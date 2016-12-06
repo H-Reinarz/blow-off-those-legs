@@ -21,7 +21,18 @@ class CSchiff{
 	public:
 		CSchiff() { // Konstruktor //Ist das so legitim?
 			//set(l);	                
-		}  
+		} 
+		
+		// piz = Punkt in Zone? Wert: 1 = JA; 0 = NEIN 
+		bool piz(int puffer, int pX, int pY){
+			if (pX >= (xCoord-puffer) && pX <= (getEndX()+puffer) &&
+				pY >= (yCoord-puffer) && pY <= (getEndY()+puffer)){
+					return 1;
+				}
+				else {return 0;}
+						
+				 
+		} 
 		
 		int isInBattlefield(int x, int y, int a, int l){ // liegt das Schiff im Spielfeld 10x10?
 			int returnCode;
@@ -99,61 +110,49 @@ class CSchiff{
 			}
 		}
 	 
-	 	bool blockiert(CSchiff anderesSchiff){
-	 		
-	 			int koordArray1[laenge][2];
-	 			int koordArray2[anderesSchiff.getLaenge()][2];
-	 			
-	 		    switch(ausrichtung){
-				case(0):
-					// Build CoordList
-					for(int i = 0; i < laenge; i++){
-						koordArray1[i][0] = xCoord+i;
-						koordArray1[i][1] = yCoord;
-					}
-					break;
-				case(1):
-					for(int i = 0; i < laenge; i++){
-						koordArray1[i][0] = xCoord;
-						koordArray1[i][1] = yCoord+i;
-					}
-					break;
+	 	// Fehlercodes: 0 = nicht blockiert; 1 = blockiert
+	 	int blockiert(CSchiff anderesSchiff, int  puffer){
+			
+			//Funktioniert nur wenn die Schiffe der Größe nach gesetzt werden!		
+			
+			//Gleiche Ausrichtung (parallel)
+			if (anderesSchiff.getAusrichtung() == ausrichtung){
+					if (piz(1, anderesSchiff.getX(), anderesSchiff.getY()) == 1 ||
+						piz(1, anderesSchiff.getEndX(), anderesSchiff.getEndY()) == 1){
+							return 1;
+						}
+					else {return 0;}
+			}
+			
+			//Ungleiche Ausrichtung (rechtwinkelig)
+			else if (anderesSchiff.getAusrichtung() != ausrichtung){
+				switch(ausrichtung){
+					case 0:
+						for (int xwalk = xCoord; xwalk <= getEndX(); xwalk++){
+						if (anderesSchiff.piz(1, xwalk, yCoord)) {return 1;}
+						}
+						return 0;
+						
+					case 1:	
+						for (int ywalk = xCoord; ywalk <= getEndY(); ywalk++){
+						if (anderesSchiff.piz(1, xCoord, ywalk)) {return 1;}
+						}
+						return 0;
+
 				}
 				
-				switch(anderesSchiff.ausrichtung){
-				case(0):
-					// Build CoordList
-					for(int i = 0; i < anderesSchiff.getLaenge(); i++){
-						koordArray2[i][0] = anderesSchiff.getX()+i;
-						koordArray2[i][1] = anderesSchiff.getY();
-					}
-					break;
-				case(1):
-					for(int i = 0; i < anderesSchiff.getLaenge(); i++){
-						koordArray2[i][0] = anderesSchiff.getX();
-						koordArray2[i][1] = anderesSchiff.getY()+i;
-					}
-					break;
-				}
-	 		
-	 			bool blockiert = false;
-				for(int i = 0; i < laenge; i++){
-					for(int j = 0; j < anderesSchiff.getLaenge(); j++){
-						if (koordArray1[i][0] == koordArray2[j][0] && koordArray1[i][1] == koordArray2[j][1]){
-							blockiert = true;
-							break;
-						}
-					}
-					if(blockiert == true){
-						return true;
-					}
-				}
-				return false;
-		 }
-	 
-		int getLaenge() {return laenge;}
+			}
+			
+			
+		}
+		
+		// Getter fuer Anfangs- und Endpunkt
 		int getX() {return xCoord;}
 		int getY() {return yCoord;}
+		int getEndX(){return (ausrichtung == 0) ? xCoord+laenge : xCoord;}
+		int getEndY(){return (ausrichtung == 1) ? yCoord+laenge : yCoord;}
+	 
+		int getLaenge() {return laenge;}
 		int getAusrichtung() {return ausrichtung;}
 		int getTreffer() {return trefferCount;}
 		
@@ -199,24 +198,31 @@ class CSpieler{
 				}
 				tryCounter = 0;	
 				
-				ausrichtung = true;
+				
 				do{
 					tryCounter++;
 					srand(time(NULL));
 					x = rand() % 10;
 					y = rand() % 10;
 					a = rand() % 2;
+					ausrichtung = true;
 					
 					bereich = flotte[schiff].spawnShip(x,y,a,schiffsGroessen[schiff]);
 				
 					for(int blockSchiff = 0; blockSchiff < schiff; blockSchiff++){
-						blockiert = flotte[schiff].blockiert(flotte[blockSchiff]);
+						blockiert = flotte[schiff].blockiert(flotte[blockSchiff], 1);
 						if(blockiert == true){
 							break;	
 						}
 					}
 					
-					switch(flotte[schiff].getAusrichtung()){
+					if(flotte[schiff].getAusrichtung() > 1){
+						ausrichtung = false;
+					}
+					
+				} while(blockiert == true || bereich == 1 || ausrichtung == false);
+				
+				switch(flotte[schiff].getAusrichtung()){
 						case(0):
 							for(int feld = flotte[schiff].getX(); feld < flotte[schiff].getX()+flotte[schiff].getLaenge(); feld++){
 								schlachtfeld[flotte[schiff].getY()][feld] = 4;
@@ -234,9 +240,6 @@ class CSpieler{
 							ausrichtung = false;
 							break;
 					}
-				} while(blockiert == true || bereich == 1 || ausrichtung == false);
-				
-				
 				
 				
 				
@@ -298,7 +301,7 @@ class CSpieler{
 						break;
 					}
 				
-			}	
+				}	
 			}
 			
 			
@@ -365,7 +368,7 @@ int main (void){
 				cout << endl << "Spielbeginn: " << endl << endl;
 				spieler1.schiffe_setzen();
 				
-				while(spieler1.getZerstoerteSchiffe() < 9){
+				while(spieler1.getZerstoerteSchiffe() <= 10){
 					spieler1.anzeigen();
 					cout << "(Geben Sie eine Zahl groesser/gleich 10 ein, um das Spiel abzubrechen)" << endl;
 					cout << "Geben Sie die X-Koordinate ein, die Sie angreifen wollen: ";
@@ -383,9 +386,10 @@ int main (void){
 				
 				if (spieler1.getZerstoerteSchiffe() >= 9){
 					cout << "<<<<<< GEWONNEN! >>>>>>" << endl << endl;
+				}else{
+					cout << endl << "Aufgegeben!" << endl << endl << endl;
+					break;	
 				}
-				cout << endl << "Aufgegeben!" << endl << endl << endl;
-				break;
 			case(2):
 				cout << endl << "Spielregeln: " << endl << endl;
 				cout << "Ja moin!" << endl << endl << endl;
