@@ -165,10 +165,7 @@ class CSpieler{
 	private:
 		CSchiff flotte[10];
 		int schlachtfeld[10][10];
-		int schlachtschiff = 1;
-		int kreuzer = 2;
-		int zerstoerer = 3;
-		int uboot = 4;
+		int schiffsGroessen[10]={5,4,4,3,3,3,2,2,2,2};
 		int zerstoerteSchiffe = 0;
 		
 		void createBattlefield(){
@@ -189,25 +186,28 @@ class CSpieler{
 			int y = 0;
 			int a = 0;
 			bool blockiert = false;
-			int imBereich;
+			int bereich;
 			bool ausrichtung = true;
+			int tryCounter = 0;
 			
 			for(int schiff = 0; schiff < 10; schiff++){
+				
 				if(schiff == 9){
-					cout << "." << endl;;	
+					cout << "." << tryCounter << endl;;	
 				} else{
-					cout << ".";
+					cout << "." << tryCounter << " ";
 				}
-					
+				tryCounter = 0;	
 				
-				
+				ausrichtung = true;
 				do{
+					tryCounter++;
 					srand(time(NULL));
 					x = rand() % 10;
 					y = rand() % 10;
 					a = rand() % 2;
 					
-					imBereich = flotte[schiff].spawnShip(x,y,a,2);
+					bereich = flotte[schiff].spawnShip(x,y,a,schiffsGroessen[schiff]);
 				
 					for(int blockSchiff = 0; blockSchiff < schiff; blockSchiff++){
 						blockiert = flotte[schiff].blockiert(flotte[blockSchiff]);
@@ -219,22 +219,22 @@ class CSpieler{
 					switch(flotte[schiff].getAusrichtung()){
 						case(0):
 							for(int feld = flotte[schiff].getX(); feld < flotte[schiff].getX()+flotte[schiff].getLaenge(); feld++){
-								schlachtfeld[flotte[schiff].getY()][feld] = 0;
+								schlachtfeld[flotte[schiff].getY()][feld] = 4;
 								//cout << schlachtfeld[flotte[schiff].getY()][feld] << endl;
 							}
 							break;
 						case(1):
 							for(int feld = flotte[schiff].getY(); feld < flotte[schiff].getY()+flotte[schiff].getLaenge();feld++){
-								schlachtfeld[feld][flotte[schiff].getX()] = 0;
+								schlachtfeld[feld][flotte[schiff].getX()] = 4;
 								//cout << schlachtfeld[feld][flotte[schiff].getX()] << endl;	
 							}
 							break;
 						default:
-							cout << "Ungueltige Ausrichtung" << endl;
+							cout << "Ungueltige Ausrichtung: " << flotte[schiff].getAusrichtung() << endl;
 							ausrichtung = false;
 							break;
 					}
-				} while(blockiert == true || imBereich == 1 || ausrichtung == false);
+				} while(blockiert == true || bereich == 1 || ausrichtung == false);
 				
 				
 				
@@ -271,30 +271,36 @@ class CSpieler{
 			
 			bool getroffen = false;
 			
-			for(int iSchiff = 0; iSchiff < 10; iSchiff++){
-				switch(flotte[iSchiff].treffer(x,y)){ 
-					case(0):
-						schlachtfeld[y][x] = 1; //Treffer
-						cout << endl << endl << "      ===== Getroffen! =====" << endl << endl;
-						getroffen = true;
+			if(schlachtfeld[y][x]>=1 && schlachtfeld[y][x]<=3){
+				cout << endl << endl << "      ===== Diese Koordinaten wurden schon einmal beschossen! =====" << endl << endl;
+				return;
+			} else{
+				for(int iSchiff = 0; iSchiff < 10; iSchiff++){
+					switch(flotte[iSchiff].treffer(x,y)){ 
+						case(0):
+							schlachtfeld[y][x] = 1; //Treffer
+							cout << endl << endl << "      ===== Getroffen! =====" << endl << endl;
+							getroffen = true;
+							break;
+						case(1):
+							schlachtfeld[y][x] = 2; //Versenkt
+							getroffen = true;
+							cout << endl << endl << "      ===== VERSENKT! =====" << endl << endl;
+							zerstoerteSchiffe++;
+							break;
+						case(2):
+							schlachtfeld[y][x] = 3; //Fehlschuss
+							getroffen = false;
+							
+							break;
+					}	
+					if(getroffen == true){
 						break;
-					case(1):
-						schlachtfeld[y][x] = 2; //Versenkt
-						getroffen = true;
-						cout << endl << endl << "      ===== VERSENKT! =====" << endl << endl;
-						zerstoerteSchiffe++;
-						break;
-					case(2):
-						schlachtfeld[y][x] = 3; //Fehlschuss
-						getroffen = false;
-						
-						break;
-				}	
-				if(getroffen == true){
-					break;
-				}
+					}
 				
+			}	
 			}
+			
 			
 			
 		}
