@@ -28,13 +28,13 @@ class CSchiff{
 			//set(l);	                
 		}  
 
-		// PaS = Punkt auf Schiff? Returns: 1 = JA; 0 = NEIN 
-		bool PaS(int puffer, int pX, int pY){
+		// piz = Punkt in Zone? Wert: 1 = JA; 0 = NEIN 
+		bool piz(int puffer, int pX, int pY){
 			if (pX >= (xCoord-puffer) && pX <= (getEndX()+puffer) &&
 				pY >= (yCoord-puffer) && pY <= (getEndY()+puffer){
-					return 1
+					return 1;
 				}
-				else {return 0}
+				else {return 0;}
 						
 				 
 		}
@@ -137,31 +137,37 @@ class CSchiff{
 			}
 		}
 		
-		// Fehlercodes: 1 = blockiert; 0 = nicht blockiert
+		// Fehlercodes: 0 = nicht blockiert; 1 = blockiert
 	 	int blockiert(CSchiff anderesSchiff, int  puffer){
 			
-			//if gleicher Anfang
+			//Funktioniert nur wenn die Schiffe der Größe nach gesetzt werden!		
 			
+			//Gleiche Ausrichtung (parallel)
 			if (anderesSchiff.getAusrichtung() == ausrichtung){
+					if (piz(puffer = 1, pX = anderesSchiff.getX(), pY = anderesSchiff.getY) == 1 ||
+						piz(puffer = 1, pX = anderesSchiff.getEndX(), pY = anderesSchiff.getEndY) == 1){
+							return 1;
+						}
+					else {return 0;}
+			}
+			
+			//Ungleiche Ausrichtung (rechtwinkelig)
+			else if (anderesSchiff.getAusrichtung() != ausrichtung){
 				switch(ausrichtung){
 					case 0:
-						// Dieses Schiff
-						int anfang_ds = xCoord
-						int ende_ds = xCoord + laenge
-						// Anderes Schiff
-						int anfang_as = anderesSchiff.getX()
-						int ende_as = anderesSchiff.getX() + anderesSchiff.getLaenge()
-						if ()
-						break;
+						for (int xwalk = xCoord; xwalk <= getEndX(); xwalk++){
+						if (anderesSchiff.piz(puffer = 1, pX = xwalk, pY = yCoord) {return 1;}
+						}
+						else {return 0;}
 						
-					case(1):
-						//for
-						break;		
-						
-				 }
-			}
-			else if {
-				//mach wat anderet!
+					case 1:	
+						for (int ywalk = xCoord; ywalk <= getEndY(); ywalk++){
+						if (anderesSchiff.piz(puffer = 1, pX = xCoord, pY = ywalk) {return 1;}
+						}
+						else {return 0;}
+
+				}
+				
 			}
 			
 			
@@ -172,8 +178,8 @@ class CSchiff{
 		// Getter fuer Anfangs- und Endpunkt
 		int getX() {return xCoord;}
 		int getY() {return yCoord;}
-		int getEndX(){return (ausrichtung == 0) ? xCoord+laenge : xCoord}
-		int getEndY(){return (ausrichtung == 1) ? yCoord+laenge : yCoord}
+		int getEndX(){return (ausrichtung == 0) ? xCoord+laenge : xCoord;}
+		int getEndY(){return (ausrichtung == 1) ? yCoord+laenge : yCoord;}
 
 		// Getter fuer andere Attribute
 		int getLaenge() {return laenge;}
