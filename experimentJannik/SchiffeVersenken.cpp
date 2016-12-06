@@ -136,6 +136,23 @@ class CSchiff{
 					}			
 			}
 		}
+
+		int treffer(int x, int y){			
+					if (piz(0, x, y) == 1){
+						trefferCount++;
+						if(trefferCount >= laenge){
+							cout << "Schiff wurde versenkt!" << endl;
+							return 1;
+						} else{
+							cout << "Schiff wurde getroffen!" << endl;
+							return 0;
+						}
+					} else{
+						cout << "Nichts getroffen!" << endl;
+						return 2;		
+		}
+		
+		
 		
 		// Fehlercodes: 0 = nicht blockiert; 1 = blockiert
 	 	int blockiert(CSchiff anderesSchiff, int  puffer){
@@ -144,8 +161,8 @@ class CSchiff{
 			
 			//Gleiche Ausrichtung (parallel)
 			if (anderesSchiff.getAusrichtung() == ausrichtung){
-					if (piz(puffer = 1, pX = anderesSchiff.getX(), pY = anderesSchiff.getY) == 1 ||
-						piz(puffer = 1, pX = anderesSchiff.getEndX(), pY = anderesSchiff.getEndY) == 1){
+					if (piz(1, anderesSchiff.getX(),anderesSchiff.getY()) == 1 ||
+						piz(1, anderesSchiff.getEndX(), anderesSchiff.getEndY()) == 1){
 							return 1;
 						}
 					else {return 0;}
@@ -158,13 +175,13 @@ class CSchiff{
 						for (int xwalk = xCoord; xwalk <= getEndX(); xwalk++){
 						if (anderesSchiff.piz(puffer = 1, pX = xwalk, pY = yCoord) {return 1;}
 						}
-						else {return 0;}
+						return 0;
 						
 					case 1:	
 						for (int ywalk = xCoord; ywalk <= getEndY(); ywalk++){
 						if (anderesSchiff.piz(puffer = 1, pX = xCoord, pY = ywalk) {return 1;}
 						}
-						else {return 0;}
+						return 0;
 
 				}
 				
