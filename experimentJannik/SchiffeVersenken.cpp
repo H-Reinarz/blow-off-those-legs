@@ -17,10 +17,45 @@ class CSchiff{
 		//	laenge = l;
 		//}
 		
+		
+		
+		
+		
+		
+		
 	public:
 		CSchiff() { // Konstruktor //Ist das so legitim?
 			//set(l);	                
 		}  
+
+		// PaS = Punkt auf Schiff? Returns: 1 = JA; 0 = NEIN 
+		bool PaS(int sl_puffer, int pX, int pY){
+			
+			switch(schiff.ausrichtung){
+					case 0:
+						// Dieses Schiff
+						int anfang_ds = xCoord
+						int ende_ds = xCoord + laenge
+						// Anderes Schiff
+						int anfang_as = anderesSchiff.getX()
+						int ende_as = anderesSchiff.getX() + anderesSchiff.getLaenge()
+						if ()
+						break;
+						
+					case(1):
+						//for
+						break;		
+						
+				 }
+		}
+
+		//Getter fuer Endkoordinate
+		int getEndX(){}
+		int getEndY(){}
+
+
+
+
 		
 		int isInBattlefield(int x, int y, int a, int l){ // liegt das Schiff im Spielfeld 10x10?
 			int returnCode;
@@ -117,7 +152,7 @@ class CSchiff{
 		}
 		
 		// Fehlercodes: 1 = blockiert; 0 = nicht blockiert
-	 	int blockiert(CSchiff anderesSchiff){
+	 	int blockiert(CSchiff anderesSchiff, int  puffer){
 			
 			//if gleicher Anfang
 			
