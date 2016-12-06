@@ -30,9 +30,13 @@ class CSchiff{
 
 		// PaS = Punkt auf Schiff? Returns: 1 = JA; 0 = NEIN 
 		bool PaS(int puffer, int pX, int pY){
-			if (pX >= (xCoord-puffer) && pX <= (getEndX()+puffer))
+			if (pX >= (xCoord-puffer) && pX <= (getEndX()+puffer) &&
+				pY >= (yCoord-puffer) && pY <= (getEndY()+puffer){
+					return 1
+				}
+				else {return 0}
 						
-				 }
+				 
 		}
 
 
