@@ -29,29 +29,11 @@ class CSchiff{
 		}  
 
 		// PaS = Punkt auf Schiff? Returns: 1 = JA; 0 = NEIN 
-		bool PaS(int sl_puffer, int pX, int pY){
-			
-			switch(schiff.ausrichtung){
-					case 0:
-						// Dieses Schiff
-						int anfang_ds = xCoord
-						int ende_ds = xCoord + laenge
-						// Anderes Schiff
-						int anfang_as = anderesSchiff.getX()
-						int ende_as = anderesSchiff.getX() + anderesSchiff.getLaenge()
-						if ()
-						break;
-						
-					case(1):
-						//for
-						break;		
+		bool PaS(int puffer, int pX, int pY){
+			if (pX >= (xCoord-puffer) && pX <= (getEndX()+puffer))
 						
 				 }
 		}
-
-		//Getter fuer Endkoordinate
-		int getEndX(){}
-		int getEndY(){}
 
 
 
@@ -181,9 +163,16 @@ class CSchiff{
 			
 		 }
 	 
-		int getLaenge() {return laenge;}
+
+		
+		// Getter fuer Anfangs- und Endpunkt
 		int getX() {return xCoord;}
 		int getY() {return yCoord;}
+		int getEndX(){return (ausrichtung == 0) ? xCoord+laenge : xCoord}
+		int getEndY(){return (ausrichtung == 1) ? yCoord+laenge : yCoord}
+
+		// Getter fuer andere Attribute
+		int getLaenge() {return laenge;}
 		int getAusrichtung() {return ausrichtung;}
 		int getTreffer() {return trefferCount;}
 		
