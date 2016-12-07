@@ -3,7 +3,7 @@
 #include <ctime>
 using namespace std;
 
-
+const int FELDGROESSE = 10;
 
 class CSchiff{
 	private:
@@ -12,16 +12,9 @@ class CSchiff{
 		int yCoord = 999;
 		int ausrichtung = 999; // 0 = Nach rechts, 1 = Nach unten
 		int trefferCount = 0;
-
-		
-		//int set(int l){ //Setter, vom Konstruktor aufgerufen
-		//	laenge = l;
-		//}
 		
 	public:
-		CSchiff() { // Konstruktor //Ist das so legitim?
-			//set(l);	                
-		} 
+		CSchiff() {} 
 		
 		// piz = Punkt in Zone? Wert: 1 = JA; 0 = NEIN 
 		bool piz(int puffer, int pX, int pY){
@@ -29,90 +22,59 @@ class CSchiff{
 				pY >= (yCoord-puffer) && pY <= (getEndY()+puffer)){
 					return 1;
 				}
-				else {return 0;}
-						
-				 
+				else {return 0;}		 
 		} 
 		
-		int isInBattlefield(int x, int y, int a, int l){ // liegt das Schiff im Spielfeld 10x10?
+		// Liegt das Schiff im Spielfeld?
+		int isInBattlefield(int x, int y, int a, int l){ 
 			int returnCode;
 			switch(a){ 
 				case(0):
-					if(x+l<=10 && x>= 0 && y <= 10 && y >= 0){
-						returnCode = 0;
-						break;
+					if(x+l<=FELDGROESSE && x>= 0 && y <= FELDGROESSE && y >= 0){
+						return 0;
 					} else{
-						returnCode = 3; // Fehlercode 3: Schiff ragt aus X-Achse
-						break;
+						return 3; // Fehlercode 3: Schiff ragt aus X-Achse
 					}
 				case(1):
-					if(x<=10 && x>= 0 && y+l <= 10 && y >= 0){
-						returnCode = 0;	
-						break;
+					if(x<=FELDGROESSE && x>= 0 && y+l <= FELDGROESSE && y >= 0){
+						return 0;	
 					} else{
-						returnCode = 4; // Fehlercode 4: Schiff ragt aus Y-Achse
-						break;
+						return 4; // Fehlercode 4: Schiff ragt aus Y-Achse
 					}
 				default:
-					returnCode = 5; // Fehlercoe 5: Ungueltige Ausrichtung
-					break;	
+					return 5; // Fehlercoe 5: Ungueltige Ausrichtung
 			}	
-			//cout << returnCode << endl;
-			return returnCode;	
 		}
 		
-		int spawnShip(int x, int y, int a, int l){
+		// Setzt das Schiff auf das Spielfeld, sofern die Koordinaten im Spielfeld liegen.
+		int setzeSchiff(int x, int y, int a, int l){
 			if(isInBattlefield(x,y,a,l) == 0){
 				xCoord = x;
 				yCoord = y;
 				ausrichtung = a;
 				laenge = l;
-				//cout << "Schiff wird gesetzt" << endl;
-				return 0;
-			} else{
-				//cout << "Das Schiff befindet sich nicht im Schlachtfeld! Aendern Sie die Position!" << endl;
 				return 1;
+			} else{
+				return 0;
 			}
 		}
 		
-		
-		
-		int treffer(int x, int y){
-			switch(ausrichtung){
-				case(0):
-					if (x >= xCoord && x<= xCoord+laenge && y == yCoord){
+		// Wurde das Schiff getroffen bzw. versenkt? Wenn ja, zaehle den Treffercounter hoch
+		int treffer(int x, int y){			
+					if (piz(0, x, y) == 1){
 						trefferCount++;
 						if(trefferCount >= laenge){
-							//cout << "Schiff wurde versenkt!" << endl;
-							return 1;
+							return 1; // Versenkt!
 						} else{
-							//cout << "Schiff wurde getroffen!" << endl;
-							return 0;
+							return 0; // Getroffen!
 						}
 					} else{
-						//cout << "Nichts getroffen!" << endl;
-						return 2;
+						return 2; // Fehlschuss!
 					}
-				case(1):
-					if (x == xCoord && y >= yCoord && y <= yCoord+laenge){
-						trefferCount++;
-						if(trefferCount >= laenge){
-							//cout << "Schiff wurde versenkt!" << endl;
-							return 1;
-						} else{
-							//cout << "Schiff wurde getroffen!" << endl;
-							return 0;
-						}
-					} else{
-						//cout << "Kein Treffer!" << endl;
-						return 2;
-					}			
-			}
 		}
 	 
 	 	// Fehlercodes: 0 = nicht blockiert; 1 = blockiert
 	 	int blockiert(CSchiff anderesSchiff, int  puffer){
-			
 			//Funktioniert nur wenn die Schiffe der Größe nach gesetzt werden!		
 			
 			//Gleiche Ausrichtung (parallel)
@@ -123,7 +85,6 @@ class CSchiff{
 						}
 					else {return 0;}
 			}
-			
 			//Ungleiche Ausrichtung (rechtwinkelig)
 			else if (anderesSchiff.getAusrichtung() != ausrichtung){
 				switch(ausrichtung){
@@ -138,12 +99,8 @@ class CSchiff{
 						if (anderesSchiff.piz(1, xCoord, ywalk)) {return 1;}
 						}
 						return 0;
-
 				}
-				
 			}
-			
-			
 		}
 		
 		// Getter fuer Anfangs- und Endpunkt
@@ -151,88 +108,89 @@ class CSchiff{
 		int getY() {return yCoord;}
 		int getEndX(){return (ausrichtung == 0) ? xCoord+laenge : xCoord;}
 		int getEndY(){return (ausrichtung == 1) ? yCoord+laenge : yCoord;}
-	 
+	 	
+	 	// Getter fuer sonstige Attribute
 		int getLaenge() {return laenge;}
 		int getAusrichtung() {return ausrichtung;}
 		int getTreffer() {return trefferCount;}
 		
-		
-		~CSchiff(){}; // Destruktor
+		// Destruktor
+		~CSchiff(){};
 };
 
 class CSpieler{
 	private:
 		CSchiff flotte[10];
-		int schlachtfeld[10][10];
-		int schiffsGroessen[10]={5,4,4,3,3,3,2,2,2,2};
+		int schlachtfeld[FELDGROESSE][FELDGROESSE];
+		//int schiffsGroessen[10]={5,4,4,3,3,3,2,2,2,2}; //Funktioniert nicht einwandfrei
+		int schiffsGroessen[10]={1,1,1,1,1,1,1,1,1,1};
 		int zerstoerteSchiffe = 0;
 		
-		void createBattlefield(){
-			for(int iy = 0; iy < 10; iy++){
-				for(int ix = 0; ix < 10; ix++){
+		// Erstelle das Schlachtfeld
+		void erstelleSchlachtfeld(){
+			for(int iy = 0; iy < FELDGROESSE; iy++){
+				for(int ix = 0; ix < FELDGROESSE; ix++){
 					schlachtfeld[iy][ix] = 0;
 				}
 			}
 		}
 		
 	public:
-		CSpieler(): flotte() {createBattlefield();} //copy Konstruktor
+		CSpieler(): flotte() {erstelleSchlachtfeld();} //copy Konstruktor
 		
-		
+		// Verteilt der Reihe nach, per Zufall, alle Schiffe
+		// WENN: ausrichtung ungueltig, nicht im Schlachtfeld oder durch ein anderes Schiff blockiert -> Wiederholung
 		void schiffe_setzen(){
-			cout << "Schiffspositionen berechnen..." << endl;
+			cout << "Schiffspositionen ermitteln..." << endl;
+			
 			int x = 0;
 			int y = 0;
 			int a = 0;
 			bool blockiert = false;
-			int bereich;
+			int gesetzt;
 			bool ausrichtung = true;
-			int tryCounter = 0;
+			int versuche = 0; // Wie oft muessen neue Zufallszahlen generiert werden, bis Schiff erfolgreich gesetzt wurde?
 			
+			// Setze die 10 Schiffe
 			for(int schiff = 0; schiff < 10; schiff++){
-				
-				if(schiff == 9){
-					cout << "." << tryCounter << endl;;	
-				} else{
-					cout << "." << tryCounter << " ";
-				}
-				tryCounter = 0;	
-				
+				versuche = 0;	
 				
 				do{
-					tryCounter++;
+					versuche++;
 					srand(time(NULL));
 					x = rand() % 10;
 					y = rand() % 10;
 					a = rand() % 2;
 					ausrichtung = true;
 					
-					bereich = flotte[schiff].spawnShip(x,y,a,schiffsGroessen[schiff]);
-				
+					// Sezte Schiff. 0 = Nicht im Schlachtfeld, 1 = Erfolgreich
+					gesetzt = flotte[schiff].setzeSchiff(x,y,a,schiffsGroessen[schiff]);
+					
+					// Wenn Schiff nicht erfolgreich gesetzt wurde ist die Ausrichtung ungueltig
+					if(flotte[schiff].getAusrichtung() > 1){
+						ausrichtung = false;
+					}
+					
+					// Gehe alle bisher gesetzten Schiffe durch und teste, ob eines davon blockiert. Wenn ja, blockiert = true
 					for(int blockSchiff = 0; blockSchiff < schiff; blockSchiff++){
 						blockiert = flotte[schiff].blockiert(flotte[blockSchiff], 1);
 						if(blockiert == true){
 							break;	
 						}
 					}
-					
-					if(flotte[schiff].getAusrichtung() > 1){
-						ausrichtung = false;
-					}
-					
-				} while(blockiert == true || bereich == 1 || ausrichtung == false);
+				} while(blockiert == true || gesetzt == false || ausrichtung == false);
 				
+				// Trage die Koordinaten des erfolgreich gesetzten Schiffes in das Spielfeld ein
+				// 0 = Leerzeichen, 4 = Schiffe anzeigen (Cheat Modus)
 				switch(flotte[schiff].getAusrichtung()){
 						case(0):
 							for(int feld = flotte[schiff].getX(); feld < flotte[schiff].getX()+flotte[schiff].getLaenge(); feld++){
-								schlachtfeld[flotte[schiff].getY()][feld] = 4;
-								//cout << schlachtfeld[flotte[schiff].getY()][feld] << endl;
+								schlachtfeld[flotte[schiff].getY()][feld] = 0;
 							}
 							break;
 						case(1):
 							for(int feld = flotte[schiff].getY(); feld < flotte[schiff].getY()+flotte[schiff].getLaenge();feld++){
-								schlachtfeld[feld][flotte[schiff].getX()] = 4;
-								//cout << schlachtfeld[feld][flotte[schiff].getX()] << endl;	
+								schlachtfeld[feld][flotte[schiff].getX()] = 0;	
 							}
 							break;
 						default:
@@ -241,79 +199,59 @@ class CSpieler{
 							break;
 					}
 				
-				
-				
-				/*
-				while(flotte[schiff].spawnShip(x,y,a,2) == 1 || (blockiert == true && schiff > 0)){ //Geht das so? Die Ueberpruefung und gleichzeitige Aufrufung der Funktion?
-					cout << "While ausgelöst" << endl;
-					
-					x = rand() % 10;
-					y = rand() % 10;
-					a = rand() % 2;
-					
-					for(int blockSchiff = 0; blockSchiff < schiff; blockSchiff++){
-						cout << "Blockiert es?2" << endl;
-						blockiert = flotte[schiff].blockiert(flotte[blockSchiff]);
-						if(blockiert == true){
-							cout << "Es blockiert" << endl;
-							break;	
-						}
-					}
+				//cout << "Schiff " << schiff <<": " << endl; //Debug Code
+				if(schiff == 9){
+					cout << "." << endl;	
+				} else{
+					cout << ".";
 				}
-				cout << "Random Numbers (X,Y,A): " << x << ", " << y << ", " << a << ", " << endl;
-				*/
-				
-				
-				
+				//anzeigen(); //Debug Code
 			}
-			
-		 
 		}
 		
+		// Angriffsfunktion
 		void attack(int x, int y){
-			
 			bool getroffen = false;
 			
+			// Wenn Schlachtfeldcode 1 (Getroffen),2 (Versenkt) oder 3 (Fehlschuss) ist, wurde das Feld schonmal beschossen
 			if(schlachtfeld[y][x]>=1 && schlachtfeld[y][x]<=3){
 				cout << endl << endl << "      ===== Diese Koordinaten wurden schon einmal beschossen! =====" << endl << endl;
 				return;
 			} else{
+				// Gehe jedes Schiff durch und pruefe, ob es getroffen wurde
 				for(int iSchiff = 0; iSchiff < 10; iSchiff++){
 					switch(flotte[iSchiff].treffer(x,y)){ 
 						case(0):
 							schlachtfeld[y][x] = 1; //Treffer
-							cout << endl << endl << "      ===== Getroffen! =====" << endl << endl;
+							cout << endl << endl << "      ===== Getroffen! =====" << endl;
 							getroffen = true;
 							break;
 						case(1):
 							schlachtfeld[y][x] = 2; //Versenkt
 							getroffen = true;
-							cout << endl << endl << "      ===== VERSENKT! =====" << endl << endl;
-							zerstoerteSchiffe++;
+							cout << endl << endl << "      ===== VERSENKT! =====" << endl;
+							zerstoerteSchiffe++; //Zerstoerte Schiffe + 1
 							break;
 						case(2):
 							schlachtfeld[y][x] = 3; //Fehlschuss
 							getroffen = false;
-							
 							break;
 					}	
 					if(getroffen == true){
 						break;
 					}
-				
-				}	
-			}
-			
-			
-			
+				}
+				cout << endl;	
+			}		
 		}
 		
+		// Zeichne das Schlachtfeld
 		void anzeigen(){
 			cout << "    0 1 2 3 4 5 6 7 8 9" << endl;
 			cout << "    -------------------" << endl;
-			for(int iy = 0; iy < 10; iy++){
+			for(int iy = 0; iy < FELDGROESSE; iy++){ // Y-Achse
 				cout << iy << " | ";
-				for(int ix = 0; ix < 10; ix++){
+				for(int ix = 0; ix < FELDGROESSE; ix++){ //X-Achse
 					switch(schlachtfeld[iy][ix]){
 						case(0): // Kein Schiff
 							cout << " " << " "; 
@@ -335,11 +273,17 @@ class CSpieler{
 			}
 		}
 		
+		// Schlachtfeld resetten
+		void resetteSchlachtfeld(){
+			for(int iy = 0; iy < FELDGROESSE; iy++){ // Y-Achse
+				for(int ix = 0; ix < FELDGROESSE; ix++){ //X-Achse
+					schlachtfeld[iy][ix] == 0;
+				}
+			}
+		}
 		
-	int getZerstoerteSchiffe()	{return zerstoerteSchiffe;}
-		
-			
-	
+		// Getter fuer die Anzahl an zerstoerten Schiffen		
+		int getZerstoerteSchiffe()	{return zerstoerteSchiffe;}
 };
 
 int main (void){
@@ -349,10 +293,11 @@ int main (void){
 	int xAuswahl = 0;
 	int yAuswahl = 0;
 	int ingameAuswahl = 0;
-	//spieler1.anzeigen();
+
 	
 	while(auswahl != 3){
-		cout << "===== SCHIFFE VERSENKEN - ALPHA VERSION =====" << endl << endl;
+		// HAUPTMENUE
+		cout << "===== SCHIFFE VERSENKEN - RUDERBOOT VERSION =====" << endl << endl;
 		cout << "Hauptmenue" << endl;
 		cout << "----------" << endl;
 		cout << "1 Neues Spiel" << endl;
@@ -364,58 +309,44 @@ int main (void){
 		cin >> auswahl;
 	
 		switch(auswahl){
-			case(1):
+			case(1): // Spielbeginn
 				cout << endl << "Spielbeginn: " << endl << endl;
 				spieler1.schiffe_setzen();
 				
-				while(spieler1.getZerstoerteSchiffe() <= 10){
+				// Solange, bis alle Schiffe zerstoert wurden
+				while(spieler1.getZerstoerteSchiffe() < 10){
 					spieler1.anzeigen();
-					cout << "(Geben Sie eine Zahl groesser/gleich 10 ein, um das Spiel abzubrechen)" << endl;
+					cout << "(Geben Sie 999 ein, um das Spiel abzubrechen)" << endl;
 					cout << "Geben Sie die X-Koordinate ein, die Sie angreifen wollen: ";
 					cin >> xAuswahl;
-					if(xAuswahl >= 10){
+					// Aufgeben?
+					if(xAuswahl == 999){
 						break;
 					}
 					cout << "Geben Sie die Y-Koordinate ein, die Sie angreifen wollen: ";
 					cin >> yAuswahl;
-					if(yAuswahl >= 10){
+					if(yAuswahl == 999){
 						break;
 					}
 					spieler1.attack(xAuswahl,yAuswahl);
 				}
 				
+				// Gewonnen oder Verloren?
 				if (spieler1.getZerstoerteSchiffe() >= 9){
 					cout << "<<<<<< GEWONNEN! >>>>>>" << endl << endl;
 				}else{
 					cout << endl << "Aufgegeben!" << endl << endl << endl;
-					break;	
 				}
+				spieler1.resetteSchlachtfeld();
+				break;
 			case(2):
 				cout << endl << "Spielregeln: " << endl << endl;
-				cout << "Ja moin!" << endl << endl << endl;
+				cout << "Es gibt Regeln!" << endl << endl << endl;
 				break;
 			case(3):
 				break;
-		}
-		
-		
+		}	
 	}
-	
-	
-	//spieler1.schiffe_setzen();
-	//spieler1.anzeigen();
-	/*
-	bool bob;
-	CSchiff schiff1;
-	schiff1.spawnShip(4,2,0,3);
-	CSchiff schiff2;
-	schiff2.spawnShip(2,2,0,3);
-	bob = schiff2.blockiert(schiff1);
-	*/
-	
-	
-	
-	
 	return 0;
 }
 
