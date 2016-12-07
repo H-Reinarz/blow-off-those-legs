@@ -30,13 +30,13 @@ class CSchiff{
 			int returnCode;
 			switch(a){ 
 				case(0):
-					if(x+l<=FELDGROESSE && x>= 0 && y <= FELDGROESSE && y >= 0){
+					if(x+l<=FELDGROESSE-1 && x>= 0 && y <= FELDGROESSE-1 && y >= 0){
 						return 0;
 					} else{
 						return 3; // Fehlercode 3: Schiff ragt aus X-Achse
 					}
 				case(1):
-					if(x<=FELDGROESSE && x>= 0 && y+l <= FELDGROESSE && y >= 0){
+					if(x<=FELDGROESSE-1 && x>= 0 && y+l <= FELDGROESSE-1 && y >= 0){
 						return 0;	
 					} else{
 						return 4; // Fehlercode 4: Schiff ragt aus Y-Achse
@@ -122,8 +122,8 @@ class CSpieler{
 	private:
 		CSchiff flotte[10];
 		int schlachtfeld[FELDGROESSE][FELDGROESSE];
-		//int schiffsGroessen[10]={5,4,4,3,3,3,2,2,2,2}; //Funktioniert nicht einwandfrei
-		int schiffsGroessen[10]={1,1,1,1,1,1,1,1,1,1};
+		int schiffsGroessen[10]={5,4,4,3,3,3,2,2,2,2}; //Funktioniert nicht einwandfrei
+		//int schiffsGroessen[10]={1,1,1,1,1,1,1,1,1,1};
 		int zerstoerteSchiffe = 0;
 		
 		// Erstelle das Schlachtfeld
@@ -151,13 +151,14 @@ class CSpieler{
 			bool ausrichtung = true;
 			int versuche = 0; // Wie oft muessen neue Zufallszahlen generiert werden, bis Schiff erfolgreich gesetzt wurde?
 			
+			srand(time(NULL));
 			// Setze die 10 Schiffe
 			for(int schiff = 0; schiff < 10; schiff++){
 				versuche = 0;	
 				
 				do{
 					versuche++;
-					srand(time(NULL));
+					
 					x = rand() % 10;
 					y = rand() % 10;
 					a = rand() % 2;
@@ -185,12 +186,12 @@ class CSpieler{
 				switch(flotte[schiff].getAusrichtung()){
 						case(0):
 							for(int feld = flotte[schiff].getX(); feld < flotte[schiff].getX()+flotte[schiff].getLaenge(); feld++){
-								schlachtfeld[flotte[schiff].getY()][feld] = 0;
+								schlachtfeld[flotte[schiff].getY()][feld] = 4;
 							}
 							break;
 						case(1):
 							for(int feld = flotte[schiff].getY(); feld < flotte[schiff].getY()+flotte[schiff].getLaenge();feld++){
-								schlachtfeld[feld][flotte[schiff].getX()] = 0;	
+								schlachtfeld[feld][flotte[schiff].getX()] = 4;	
 							}
 							break;
 						default:
