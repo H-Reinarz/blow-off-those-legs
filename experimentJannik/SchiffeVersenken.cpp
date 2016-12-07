@@ -1,3 +1,5 @@
+// Henning Reinarz und Jannik Guenther
+// Programmieren in C++
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
