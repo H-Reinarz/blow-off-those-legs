@@ -124,8 +124,8 @@ class CSpieler{
 	private:
 		CSchiff flotte[10];
 		int schlachtfeld[FELDGROESSE][FELDGROESSE];
-		int schiffsGroessen[10]={5,4,4,3,3,3,2,2,2,2}; //Funktioniert nicht einwandfrei
-		//int schiffsGroessen[10]={1,1,1,1,1,1,1,1,1,1};
+		//int schiffsGroessen[10]={5,4,4,3,3,3,2,2,2,2}; //Funktioniert nicht einwandfrei
+		int schiffsGroessen[10]={1,1,1,1,1,1,1,1,1,1};
 		int zerstoerteSchiffe = 0;
 		
 		// Erstelle das Schlachtfeld
@@ -161,6 +161,11 @@ class CSpieler{
 				do{
 					versuche++;
 					
+					if(versuche >= 1000){
+						cout << "Laden Fehlgeschlagen..." << endl;
+						break;
+					}
+					
 					x = rand() % 10;
 					y = rand() % 10;
 					a = rand() % 2;
@@ -188,12 +193,12 @@ class CSpieler{
 				switch(flotte[schiff].getAusrichtung()){
 						case(0):
 							for(int feld = flotte[schiff].getX(); feld < flotte[schiff].getX()+flotte[schiff].getLaenge(); feld++){
-								schlachtfeld[flotte[schiff].getY()][feld] = 4;
+								schlachtfeld[flotte[schiff].getY()][feld] = 0;
 							}
 							break;
 						case(1):
 							for(int feld = flotte[schiff].getY(); feld < flotte[schiff].getY()+flotte[schiff].getLaenge();feld++){
-								schlachtfeld[feld][flotte[schiff].getX()] = 4;	
+								schlachtfeld[feld][flotte[schiff].getX()] = 0;	
 							}
 							break;
 						default:
@@ -280,7 +285,7 @@ class CSpieler{
 		void resetteSchlachtfeld(){
 			for(int iy = 0; iy < FELDGROESSE; iy++){ // Y-Achse
 				for(int ix = 0; ix < FELDGROESSE; ix++){ //X-Achse
-					schlachtfeld[iy][ix] == 0;
+					schlachtfeld[iy][ix] = 0;
 				}
 			}
 		}
@@ -313,6 +318,7 @@ int main (void){
 	
 		switch(auswahl){
 			case(1): // Spielbeginn
+				spieler1.resetteSchlachtfeld();
 				cout << endl << "Spielbeginn: " << endl << endl;
 				spieler1.schiffe_setzen();
 				
@@ -340,7 +346,7 @@ int main (void){
 				}else{
 					cout << endl << "Aufgegeben!" << endl << endl << endl;
 				}
-				spieler1.resetteSchlachtfeld();
+				
 				break;
 			case(2):
 				cout << endl << "Spielregeln: " << endl << endl;
