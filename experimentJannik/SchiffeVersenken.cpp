@@ -193,12 +193,12 @@ class CSpieler{
 				switch(flotte[schiff].getAusrichtung()){
 						case(0):
 							for(int feld = flotte[schiff].getX(); feld < flotte[schiff].getX()+flotte[schiff].getLaenge(); feld++){
-								schlachtfeld[flotte[schiff].getY()][feld] = 0;
+								schlachtfeld[flotte[schiff].getY()][feld] = 4;
 							}
 							break;
 						case(1):
 							for(int feld = flotte[schiff].getY(); feld < flotte[schiff].getY()+flotte[schiff].getLaenge();feld++){
-								schlachtfeld[feld][flotte[schiff].getX()] = 0;	
+								schlachtfeld[feld][flotte[schiff].getX()] = 4;	
 							}
 							break;
 						default:
@@ -290,6 +290,35 @@ class CSpieler{
 			}
 		}
 		
+		// Verloren
+		bool verloren(){
+			if (zerstoerteSchiffe >= 10){
+				return true;
+			} else{
+				return false;
+			}
+		}
+		
+		// Spielzug Spieler
+		void spielzugSpieler(){
+			int xAuswahl;
+			int yAuswahl;
+			
+			anzeigen();
+			cout << "(Geben Sie 999 ein, um das Spiel abzubrechen)" << endl;
+			cout << "Geben Sie die X-Koordinate ein, die Sie angreifen wollen: ";
+			cin >> xAuswahl;
+			// Aufgeben?
+			if(xAuswahl == 999){
+				break;
+			}
+			cout << "Geben Sie die Y-Koordinate ein, die Sie angreifen wollen: ";
+			cin >> yAuswahl;
+			if(yAuswahl == 999){
+				break;
+			}
+			attack(xAuswahl,yAuswahl);
+		}
 		// Getter fuer die Anzahl an zerstoerten Schiffen		
 		int getZerstoerteSchiffe()	{return zerstoerteSchiffe;}
 };
