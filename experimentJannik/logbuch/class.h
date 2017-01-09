@@ -51,14 +51,24 @@ class cTimestamp{
 };
 
 class cText{
-	private:
+	protected:
 		int len;
 		char* txt;
 	public:
+		cText();
 		cText(char* t);
 		cText(const cText& s);
 		~cText();
-		void print(){cout << txt;}
+		cText& operator=(const cText&s);
+		virtual void print(){cout << txt;}
+		int find(char* f);
+};
+
+class cStr: public cText{
+	public:
+		cStr(char* t) : cText(t){}
+		void setText(char* t);
+		void print();
 };
 
 #endif

@@ -54,14 +54,58 @@ cText::cText(const cText& s){
 	strcpy(txt, s.txt);
 }
 
+cText& cText::operator=(const cText& s){
+	free(txt);
+	len = s.len;
+	txt = (char*)malloc(len+1);
+	strcpy(txt,s.txt);
+	return *this;
+}
+
+int cText::find(char* f){
+	char* pos = strstr(txt, f); //gibt NULL zurück wenn f nicht in txt enthalten ist
+	
+	if(!pos)
+		return -1;
+	else
+		return(pos - txt);
+}
+
+cText::cText(){
+	len = strlen("leer");
+	txt = (char*) malloc(len+1);
+	strcpy(txt, "leer");
+}
+
+void cStr::setText(char* t){
+	free(txt);
+	len = strlen(t);
+	txt = (char*) malloc(len + 1);
+	strcpy(txt,t);
+}
+
+void cStr::print(){
+	cout << "<<" << txt << ">>" << endl;
+}
+
 int main(){
 	
-	cTimestamp ts(28,8,1990,13,37);
-	ts.print();
+	//cTimestamp ts(28,8,1990,13,37);
+	//ts.print();
 	
-	cText txt1("Lol");
-	txt1.print();
+	cStr string2("Lolbert");
+	string2.print();
+	string2.setText("Dorschbert");
+	string2.print();
 	
+	// Virtual testen:
+	cText *t;
+	t = new cText("Das ist ein cText.");
+	t->print();
+	cout << endl;
+	cText *t2;
+	t2 = new cStr("Das ist ein cStr.");
+	t2->print();
 		
 	return 0;
 }
