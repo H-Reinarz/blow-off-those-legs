@@ -32,13 +32,9 @@ void cAbstractNetworkNode::receivePacket(cPacket p){
 	} 
 		if(successor != nullptr){
 			sendPacket(p);
-		}
-		
+		}	
 }
 	
-	
-
-
 void cAbstractNetworkNode::sendPacket(cPacket p){
 	cout << "Fehler: Abstrakte Funktion wurde anstelle der ueberladenen Funktion aufgerufen." << endl;
 }
@@ -54,7 +50,6 @@ void cConsoleLogNode::sendPacket(cPacket p){
 }
 
 void cEncryptionNode::sendPacket(cPacket p){
-	
 	char *crypt = p.getData();
 	for(int i = 0; i < p.getLength(); i++) {
 		crypt[i] = crypt[i]+(shift%26);
@@ -63,29 +58,43 @@ void cEncryptionNode::sendPacket(cPacket p){
 	successor->receivePacket(p);
 }
 
+void cDataLoseNode::sendPacket(cPacket p){
+	char* dat = p.getData();
+	for(int i = 0; i < p.getLength(); i++) {
+		if(i%2 == 0)
+			dat[i] = 'b';
+		else
+			dat[i] = 'o';
+	}
+	successor->receivePacket(p);
+}
+
 int main(){
 	
-	char s[] = "bob";
-	//char* daten = s;
-	
-
+	char s[] = "Hallo I bims";
 	cPacket p1(0,5,s);
-	cout << p1.getCheck() << endl;
-	cout << p1.validate();
+	cPacket p2(0,150,s);
 	
-	cout << endl << endl;
 	//cAbstractNetworkNode network(1,5,0);
-	cConsoleLogNode start(1,5);
-	cEncryptionNode network1(1,5,2);
-	cConsoleLogNode network2(1,5);
-	cConsoleLogNode network3(1,5);
-
-	start.setSuccessor(&network1);
-	network1.setSuccessor(&network2);
-	network2.setSuccessor(&network3);
+	cout << "Initialisiere Netzwerk..." << endl;
+	cConsoleLogNode start(0,200,(char*)"start");
+	cEncryptionNode enc(0,200,(char*)"enc",5);
+	cConsoleLogNode afterEnc(0,200,(char*)"afterEnc");
+	cEncryptionNode dec(0,200,(char*)"dec",-5);
+	cConsoleLogNode afterDec(0,200,(char*)"afterDec");
+	cDataLoseNode loose(0,50,(char*)"loose");
+	cConsoleLogNode end(0,50,(char*)"end");
+	cout << "Schicke Packet..." << endl << endl;
 	
 	
-	 start.sendPacket(p1);
+	start.setSuccessor(&enc);
+	enc.setSuccessor(&afterEnc);
+	afterEnc.setSuccessor(&dec);
+	dec.setSuccessor(&afterDec);
+	afterDec.setSuccessor(&loose);
+	loose.setSuccessor(&end);
+	
+	 start.sendPacket(p2);
 	
 	return 0;
 }

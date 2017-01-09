@@ -32,9 +32,6 @@ class cPacket{
 			o << "from: " << p.getSource() << " dest: " << p.getDest() << " data: '" << p.getData() << "'";
 			return o;
 		}
-		
-		
-	
 };
 
 class cAbstractNetworkNode{
@@ -44,18 +41,18 @@ class cAbstractNetworkNode{
 		int startRange;
 		int endRange;
 		cAbstractNetworkNode *successor = nullptr;
-		//char* id;
-		int id;
+		char* id;
+		//int id;
 	public:
 		
-		cAbstractNetworkNode(int s, int e):
-			startRange(s), endRange(e){count++;cout << "Instance Counter: " << count << endl; id=count; cout << "Objekt mit ID: " << id << " wurde erstellt" << endl;}
+		cAbstractNetworkNode(int s, int e, char* idStr):
+			startRange(s), endRange(e), id(idStr){count++;cout << "Instance Counter: " << count << " Objekt mit ID: " << id << " wurde erstellt" << endl;}
 		
 			
 		void receivePacket(cPacket p);
 		virtual void sendPacket(cPacket p);
 		int getInstances(){return count;}
-		int getID(){return id;}
+		char* getID(){return id;}
 		void setSuccessor(cAbstractNetworkNode *suc){successor = suc;}
 		
 		~cAbstractNetworkNode(){}
@@ -63,13 +60,13 @@ class cAbstractNetworkNode{
 
 class cIdentityNode : public cAbstractNetworkNode{
 	public:
-		cIdentityNode(int s, int e):cAbstractNetworkNode(s,e){}
+		cIdentityNode(int s, int e, char* idStr):cAbstractNetworkNode(s,e,idStr){}
 		void sendPacket(cPacket p); 
 };
 
 class cConsoleLogNode : public cIdentityNode{
 	public:
-		cConsoleLogNode(int s, int e):cIdentityNode(s,e){}
+		cConsoleLogNode(int s, int e, char* idStr):cIdentityNode(s,e,idStr){}
 		void sendPacket(cPacket p); 
 };
 
@@ -77,7 +74,13 @@ class cEncryptionNode : public cAbstractNetworkNode{
 	private:
 		int shift;
 	public:
-		cEncryptionNode(int s, int e, int shiftNr):cAbstractNetworkNode(s,e), shift(shiftNr){}
+		cEncryptionNode(int s, int e, char* idStr, int shiftNr):cAbstractNetworkNode(s,e,idStr), shift(shiftNr){}
+		void sendPacket(cPacket p);
+};
+
+class cDataLoseNode : public cAbstractNetworkNode{
+	public:
+		cDataLoseNode(int s, int e, char* idStr):cAbstractNetworkNode(s,e,idStr){}
 		void sendPacket(cPacket p);
 };
 
